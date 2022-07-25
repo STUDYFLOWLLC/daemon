@@ -1,22 +1,22 @@
-const { v4 } = require("uuid")
+import { v4 as uuid } from 'uuid'
 
 export default function createDefaultBody() {
   return JSON.stringify([
     {
-      id: v4(),
+      id: uuid(),
       index: 0,
-      tag: "p",
+      tag: 'p',
       tabs: 0,
       p: {
         richText: [
           {
-            type: "text",
+            type: 'text',
             text: {
-              content: "",
+              content: '',
             },
           },
         ],
-        color: "text-current",
+        color: 'text-current',
       },
     },
   ])
