@@ -29,6 +29,17 @@ export default async function automate(
   const log = log4js.getLogger()
   log.trace("Running general automation")
 
+  // make main automation log for timer
+  const mainAutomation = await supabase
+    .from("AutomationLog")
+    .insert([{ Success: true, Message: "{/MainAutomation/}" }])
+  if (mainAutomation.data) log.trace("Main AutomationLog created")
+  if (mainAutomation.error)
+    log.error(
+      "Failed to create main AutomationLog. Error message: " +
+        mainAutomation.error.message
+    )
+
   const fetchAutomations = await supabase.from("Automation").select("*")
   const automations = fetchAutomations.data as Automation[]
   if (!automations) return
