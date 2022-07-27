@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.35.4",
+    "algoliasearch": "^4.14.2",
     "date-fns": "^2.29.1",
     "dotenv": "^16.0.1",
     "google-auth-library": "^8.1.1",
