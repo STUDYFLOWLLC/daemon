@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { google } from 'googleapis'
 import log4js from 'log4js'
 import automate from './automate'
+import updateAlgolia from './updateAlgolia'
 
 /**
  * Initialize the two clients needed for automation: google and supabase.
@@ -35,5 +36,9 @@ export default function init() {
   )
 
   automate(oAuth2Client, supabase)
-  setInterval(() => automate(oAuth2Client, supabase), 1000 * 60 * 15)
+  updateAlgolia()
+  setInterval(() => {
+    automate(oAuth2Client, supabase)
+    updateAlgolia()
+  }, 1000 * 60 * 15)
 }
