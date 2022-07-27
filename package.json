@@ -1,7 +1,8 @@
 {
   "scripts": {
     "automate": "npx ts-node index.ts",
-    "lint": "eslint '**/*.ts'"
+    "lint": "eslint '**/*.ts'",
+    "prettier": "npx prettier --write ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.35.4",
