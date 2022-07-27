@@ -1,4 +1,4 @@
-import CourseOnTermAutomation from "./CourseOnTermAutomation"
+import CourseOnTermAutomation from './CourseOnTermAutomation'
 
 export default interface Automation {
   AutomationID: number

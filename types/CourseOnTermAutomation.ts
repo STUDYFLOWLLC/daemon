@@ -1,18 +1,18 @@
-import AutomationLog from "types/AutomationLog"
+import AutomationLog from 'types/AutomationLog'
 
 enum FlowType {
-  LECTURE = "LECTURE",
-  DISCUSSION = "DISCUSSION",
-  NOTE = "NOTE",
-  ASSIGNMENT = "ASSIGNMENT",
-  ASSESSMENT = "ASSESSMENT",
-  SYNTHESIS = "SYNTHESIS",
+  LECTURE = 'LECTURE',
+  DISCUSSION = 'DISCUSSION',
+  NOTE = 'NOTE',
+  ASSIGNMENT = 'ASSIGNMENT',
+  ASSESSMENT = 'ASSESSMENT',
+  SYNTHESIS = 'SYNTHESIS',
 }
 
 enum FlowVisibility {
-  HIDDEN = "HIDDEN",
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
+  HIDDEN = 'HIDDEN',
+  PRIVATE = 'PRIVATE',
+  PUBLIC = 'PUBLIC',
 }
 
 export default interface CourseOnTermAutomation {

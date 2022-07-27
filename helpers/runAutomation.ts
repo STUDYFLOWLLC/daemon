@@ -1,9 +1,9 @@
-import { SupabaseClient } from "@supabase/supabase-js"
-import { google } from "googleapis"
-import log4js from "log4js"
-import CourseOnTermAutomation from "types/CourseOnTermAutomation"
-import { v4 as uuid } from "uuid"
-import createDefaultBody from "../utils/createDefaultBody"
+import { SupabaseClient } from '@supabase/supabase-js'
+import { google } from 'googleapis'
+import log4js from 'log4js'
+import CourseOnTermAutomation from 'types/CourseOnTermAutomation'
+import { v4 as uuid } from 'uuid'
+import createDefaultBody from '../utils/createDefaultBody'
 
 /**
  * Lists the names and IDs of up to 10 files.
@@ -13,17 +13,17 @@ import createDefaultBody from "../utils/createDefaultBody"
 export default function runAutomation(
   oAuth2Client: any,
   supabase: SupabaseClient,
-  courseOnTermAutomation: CourseOnTermAutomation
+  courseOnTermAutomation: CourseOnTermAutomation,
 ) {
   const log = log4js.getLogger()
 
   // initialize the drive object for api calls
-  const drive = google.drive({ version: "v3", auth: oAuth2Client })
+  const drive = google.drive({ version: 'v3', auth: oAuth2Client })
   // get the user's files in class folder that have not been automated yet
   drive.files.list(
     {
       pageSize: 1000,
-      fields: "nextPageToken, files(id, name, appProperties)",
+      fields: 'nextPageToken, files(id, name, appProperties)',
       q: `'${courseOnTermAutomation.FolderID}' in parents and not appProperties has { key='flowed' and value='yes' }
       `,
     },
@@ -32,32 +32,32 @@ export default function runAutomation(
 
       const files = res?.data.files
       log.trace(
-        "Fetched " +
+        'Fetched ' +
           files?.length +
-          " unautomated files for CourseOnTermAutomation " +
-          courseOnTermAutomation.CourseOnTermAutomationID
+          ' unautomated files for CourseOnTermAutomation ' +
+          courseOnTermAutomation.CourseOnTermAutomationID,
       )
       if (!files) return
 
       for (const file of files) {
-        log.trace("Automating file " + file.id)
+        log.trace('Automating file ' + file.id)
         file.appProperties = {
           ...file.appProperties,
-          flowed: "yes",
+          flowed: 'yes',
         }
         // @ts-expect-error this works, fix later
         drive.files.update({
           fileId: file.id,
           resource: { appProperties: file.appProperties },
         })
-        log.trace("Successfully updated file properties for file " + file.id)
+        log.trace('Successfully updated file properties for file ' + file.id)
 
         // create log
         log.trace(
-          "Creating AutomationLog for CourseOnTermAutomation " +
-            courseOnTermAutomation.CourseOnTermAutomationID
+          'Creating AutomationLog for CourseOnTermAutomation ' +
+            courseOnTermAutomation.CourseOnTermAutomationID,
         )
-        const logCreate = await supabase.from("AutomationLog").insert([
+        const logCreate = await supabase.from('AutomationLog').insert([
           {
             Success: true,
             Message: file.name,
@@ -66,14 +66,14 @@ export default function runAutomation(
               courseOnTermAutomation.CourseOnTermAutomationID,
           },
         ])
-        if (logCreate.data) log.trace("Successfully created log.")
+        if (logCreate.data) log.trace('Successfully created log.')
         if (logCreate.error)
-          log.trace("Could not create log. Message: " + logCreate.error.message)
+          log.trace('Could not create log. Message: ' + logCreate.error.message)
 
         // create flow
         const id = uuid()
-        log.trace("Creating flow " + id)
-        const flowCreate = await supabase.from("Flow").insert([
+        log.trace('Creating flow ' + id)
+        const flowCreate = await supabase.from('Flow').insert([
           {
             FlowID: id,
             Type: courseOnTermAutomation.DefaultType,
@@ -84,15 +84,15 @@ export default function runAutomation(
             WasAutomated: true,
           },
         ])
-        if (flowCreate.data) log.trace("Successfully created flow " + id)
+        if (flowCreate.data) log.trace('Successfully created flow ' + id)
         if (flowCreate.error)
           log.error(
-            "Could not create flow " +
+            'Could not create flow ' +
               id +
-              ". Message: " +
-              flowCreate.error.message
+              '. Message: ' +
+              flowCreate.error.message,
           )
       }
-    }
+    },
   )
 }
