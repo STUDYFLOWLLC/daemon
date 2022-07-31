@@ -1,7 +1,0 @@
-[2022-07-24T22:53:03.308] [TRACE] default - Initializing oauth and supabase
-[2022-07-24T22:53:03.310] [TRACE] default - Running general automation
-[2022-07-24T22:53:03.919] [ERROR] default - Failed to create main AutomationLog. Error message: null value in column "FK_CourseOnTermAutomationID" of relation "AutomationLog" violates not-null constraint
-[2022-07-24T22:53:04.347] [TRACE] default - Running automation with AutomationID 18
-[2022-07-24T22:53:05.624] [TRACE] default - Fetched 0 unautomated files for CourseOnTermAutomation 7
-[2022-07-24T22:53:05.625] [TRACE] default - Fetched 0 unautomated files for CourseOnTermAutomation 6
-[2022-07-24T22:53:05.639] [TRACE] default - Fetched 0 unautomated files for CourseOnTermAutomation 5
