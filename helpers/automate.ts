@@ -16,36 +16,54 @@ import runAutomation from './runAutomation'
 export default async function automate(
   oAuth2Client: any,
   supabase: SupabaseClient,
+  disableLogs?: boolean,
 ) {
-  // configure logger for organization
-  const byDay = format(new Date(), 'MM-dd-yy')
-  const byMinute = format(new Date(), 'HH:mm')
-  log4js.configure({
-    appenders: {
-      default: { type: 'file', filename: `logs/${byDay}/${byMinute}.log` },
-    },
-    categories: { default: { appenders: ['default'], level: 'trace' } },
-  })
   const log = log4js.getLogger()
-  log.trace('Running general automation')
+  if (!disableLogs) {
+    // configure logger for organization
+    const byDay = format(new Date(), 'MM-dd-yy')
+    const byMinute = format(new Date(), 'HH:mm')
+    log4js.configure({
+      appenders: {
+        out: { type: 'stdout' },
+        everything: {
+          type: 'dateFile',
+          filename: `logs/${byDay}/${byMinute}.log`,
+          pattern: 'old/yyyy-MM/yyyy-MM-dd-hhmmss0000', // added seconds so can roll fast without waiting
+          keepFileExt: true,
+          numBackups: 5, // total 6 files (1 hot + 5 backups)
+        },
+      },
+      categories: {
+        default: { appenders: ['out', 'everything'], level: 'debug' },
+      },
+    })
+    const log = log4js.getLogger()
+    log.trace('Running general automation')
+  }
 
   // make main automation log for timer
   const mainAutomation = await supabase
     .from('AutomationLog')
     .insert([{ Success: true, Message: '{/MainAutomation/}' }])
-  if (mainAutomation.data) log.trace('Main AutomationLog created')
-  if (mainAutomation.error)
-    log.error(
-      'Failed to create main AutomationLog. Error message: ' +
-        mainAutomation.error.message,
-    )
+  if (!disableLogs) {
+    if (mainAutomation.data) log.trace('Main AutomationLog created')
+    if (mainAutomation.error)
+      log.error(
+        'Failed to create main AutomationLog. Error message: ' +
+          mainAutomation.error.message,
+      )
+  }
 
   const fetchAutomations = await supabase.from('Automation').select('*')
   const automations = fetchAutomations.data as Automation[]
   if (!automations) return
 
   for (const automation of automations) {
-    log.trace(`Running automation with AutomationID ${automation.AutomationID}`)
+    !disableLogs &&
+      log.trace(
+        `Running automation with AutomationID ${automation.AutomationID}`,
+      )
 
     // set refresh token for api access
     oAuth2Client.setCredentials({
@@ -63,7 +81,7 @@ export default async function automate(
 
     // run each of the user's automations
     for (const courseOnTermAutomation of courseOnTermAutomations) {
-      runAutomation(oAuth2Client, supabase, courseOnTermAutomation)
+      runAutomation(oAuth2Client, supabase, courseOnTermAutomation, disableLogs)
     }
   }
 }
