@@ -1,3 +1,3 @@
 import init from './helpers/init'
 
-init()
+init(true)

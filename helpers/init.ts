@@ -10,19 +10,30 @@ import updateAlgolia from './updateAlgolia'
  * Initialize the two clients needed for automation: google and supabase.
  * Then call start the automation.
  */
-export default function init() {
+export default function init(disableLogs?: boolean) {
   dotenv.config()
 
-  const byDay = format(new Date(), 'MM-dd-yy')
-  const byMinute = format(new Date(), 'HH:mm')
-  log4js.configure({
-    appenders: {
-      default: { type: 'file', filename: `logs/${byDay}/${byMinute}.log` },
-    },
-    categories: { default: { appenders: ['default'], level: 'trace' } },
-  })
-  const log = log4js.getLogger()
-  log.trace('Initializing oauth and supabase')
+  if (!disableLogs) {
+    const byDay = format(new Date(), 'MM-dd-yy')
+    const byMinute = format(new Date(), 'HH:mm')
+    log4js.configure({
+      appenders: {
+        out: { type: 'stdout' },
+        everything: {
+          type: 'dateFile',
+          filename: `logs/${byDay}/${byMinute}.log`,
+          pattern: 'old/yyyy-MM/yyyy-MM-dd-hhmmss0000', // added seconds so can roll fast without waiting
+          keepFileExt: true,
+          numBackups: 5, // total 6 files (1 hot + 5 backups)
+        },
+      },
+      categories: {
+        default: { appenders: ['out', 'everything'], level: 'debug' },
+      },
+    })
+    const log = log4js.getLogger()
+    log.trace('Initializing oauth and supabase')
+  }
 
   const oAuth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -35,10 +46,10 @@ export default function init() {
     process.env.SUPABASE_KEY || '',
   )
 
-  automate(oAuth2Client, supabase)
+  automate(oAuth2Client, supabase, disableLogs)
   updateAlgolia()
   setInterval(() => {
-    automate(oAuth2Client, supabase)
+    automate(oAuth2Client, supabase, disableLogs)
     updateAlgolia()
   }, 1000 * 60 * 15)
 }

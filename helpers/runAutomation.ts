@@ -14,6 +14,7 @@ export default function runAutomation(
   oAuth2Client: any,
   supabase: SupabaseClient,
   courseOnTermAutomation: CourseOnTermAutomation,
+  disableLogs?: boolean,
 ) {
   const log = log4js.getLogger()
 
@@ -28,19 +29,20 @@ export default function runAutomation(
       `,
     },
     async (err, res) => {
-      if (err) return log.error(err.message)
+      if (err && !disableLogs) return log.error(err.message)
 
       const files = res?.data.files
-      log.trace(
-        'Fetched ' +
-          files?.length +
-          ' unautomated files for CourseOnTermAutomation ' +
-          courseOnTermAutomation.CourseOnTermAutomationID,
-      )
+      !disableLogs &&
+        log.trace(
+          'Fetched ' +
+            files?.length +
+            ' unautomated files for CourseOnTermAutomation ' +
+            courseOnTermAutomation.CourseOnTermAutomationID,
+        )
       if (!files) return
 
       for (const file of files) {
-        log.trace('Automating file ' + file.id)
+        !disableLogs && log.trace('Automating file ' + file.id)
         file.appProperties = {
           ...file.appProperties,
           flowed: 'yes',
@@ -50,13 +52,15 @@ export default function runAutomation(
           fileId: file.id,
           resource: { appProperties: file.appProperties },
         })
-        log.trace('Successfully updated file properties for file ' + file.id)
+        !disableLogs &&
+          log.trace('Successfully updated file properties for file ' + file.id)
 
         // create log
-        log.trace(
-          'Creating AutomationLog for CourseOnTermAutomation ' +
-            courseOnTermAutomation.CourseOnTermAutomationID,
-        )
+        !disableLogs &&
+          log.trace(
+            'Creating AutomationLog for CourseOnTermAutomation ' +
+              courseOnTermAutomation.CourseOnTermAutomationID,
+          )
         const logCreate = await supabase.from('AutomationLog').insert([
           {
             Success: true,
@@ -66,13 +70,14 @@ export default function runAutomation(
               courseOnTermAutomation.CourseOnTermAutomationID,
           },
         ])
-        if (logCreate.data) log.trace('Successfully created log.')
-        if (logCreate.error)
+        if (logCreate.data && !disableLogs)
+          log.trace('Successfully created log.')
+        if (logCreate.error && !disableLogs)
           log.trace('Could not create log. Message: ' + logCreate.error.message)
 
         // create flow
         const id = uuid()
-        log.trace('Creating flow ' + id)
+        !disableLogs && log.trace('Creating flow ' + id)
         const flowCreate = await supabase.from('Flow').insert([
           {
             FlowID: id,
@@ -84,8 +89,9 @@ export default function runAutomation(
             WasAutomated: true,
           },
         ])
-        if (flowCreate.data) log.trace('Successfully created flow ' + id)
-        if (flowCreate.error)
+        if (flowCreate.data && !disableLogs)
+          log.trace('Successfully created flow ' + id)
+        if (flowCreate.error && !disableLogs)
           log.error(
             'Could not create flow ' +
               id +
