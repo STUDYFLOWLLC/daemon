@@ -15,12 +15,19 @@ enum FlowVisibility {
   PUBLIC = 'PUBLIC',
 }
 
+export enum RepetitionType {
+  FOURTEN = 'FOURTEN',
+  FOURTHIRTY = 'FOURTHIRTY',
+  SIXTHIRTY = 'SIXTHIRTY',
+}
+
 export default interface CourseOnTermAutomation {
   CourseOnTermAutomationID: number
   FolderID: string
   AutomationLog: AutomationLog[]
   DefaultType: FlowType
   DefaultVisibility: FlowVisibility
+  DefaultRepetitionType: RepetitionType
   FK_AutomationID: number
   FK_CourseOnTermID: number
 }
