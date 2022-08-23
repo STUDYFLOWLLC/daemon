@@ -21,13 +21,15 @@ export default function runAutomation(
 ) {
   const log = log4js.getLogger()
 
+  console.log('hi')
+
   // initialize the drive object for api calls
   const drive = google.drive({ version: 'v3', auth: oAuth2Client })
   // get the user's files in class folder that have not been automated yet
   drive.files.list(
     {
       pageSize: 1000,
-      fields: 'nextPageToken, files(id, name, appProperties, webContentLink)',
+      fields: 'files(id, name, appProperties)',
       q: `'${courseOnTermAutomation.FolderID}' in parents and not appProperties has { key='flowed' and value='yes' }
       `,
     },
@@ -35,6 +37,7 @@ export default function runAutomation(
       if (err && !disableLogs) return log.error(err.message)
 
       const files = res?.data.files
+      console.log(files)
       !disableLogs &&
         log.trace(
           'Fetched ' +

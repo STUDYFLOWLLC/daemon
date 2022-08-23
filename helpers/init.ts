@@ -24,7 +24,6 @@ export default function init(disableLogs?: boolean) {
           filename: `logs/${byDay}/${byMinute}.log`,
           pattern: 'old/yyyy-MM/yyyy-MM-dd-hhmmss0000', // added seconds so can roll fast without waiting
           keepFileExt: true,
-          numBackups: 5, // total 6 files (1 hot + 5 backups)
         },
       },
       categories: {

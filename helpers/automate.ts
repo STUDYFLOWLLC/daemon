@@ -18,7 +18,7 @@ export default async function automate(
   supabase: SupabaseClient,
   disableLogs?: boolean,
 ) {
-  const log = log4js.getLogger()
+  let log = log4js.getLogger()
   if (!disableLogs) {
     // configure logger for organization
     const byDay = format(new Date(), 'MM-dd-yy')
@@ -38,7 +38,8 @@ export default async function automate(
         default: { appenders: ['out', 'everything'], level: 'debug' },
       },
     })
-    const log = log4js.getLogger()
+    console.log('here')
+    log = log4js.getLogger()
     log.trace('Running general automation')
   }
 
@@ -58,6 +59,8 @@ export default async function automate(
   const fetchAutomations = await supabase.from('Automation').select('*')
   const automations = fetchAutomations.data as Automation[]
   if (!automations) return
+
+  console.log(automations)
 
   for (const automation of automations) {
     !disableLogs &&
